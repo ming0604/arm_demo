@@ -2,5 +2,6 @@
 
     <node pkg="demo" type="demo_send_script_speed_pid_GUI_multi_file_move_to_init" name="demo_move_to_init" output="screen">
         <param name="traj_csv_path" value="/home/lab816/localization_ws/src/tmr_ros1/demo/data_setting/tm5_L055_vec_1_6_0_t_60_acct_20.csv" />
+        <param name="speed_percent" value="80" />
     </node>
 </launch>
