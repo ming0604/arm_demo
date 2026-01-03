@@ -102,7 +102,8 @@ int main(int argc, char **argv)
   std::vector<std::vector<float>> data;
 
   int count = 0;
-  float speed_saturation = 20.0;
+  // float speed_saturation = 20.0;
+  float speed_saturation = 45.0;
   float position_tolerance = 2.0; 
 
   float goal_joint[6];
