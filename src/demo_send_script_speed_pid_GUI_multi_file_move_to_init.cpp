@@ -92,6 +92,21 @@ int main(int argc, char **argv)
   // get parameters from launch file or command line
   nh_private.param<std::string>("traj_csv_path", csv_path, "/Default/path");
   nh_private.param<std::string>("speed_percent", PTP_speed, "80");
+  
+  // Limit speed to 1~100
+  int speed_val = std::stoi(PTP_speed);
+  if(speed_val > 100) 
+  {
+    speed_val = 100;
+    ROS_WARN("Speed parameter > 100, clamped to 100.");
+  } 
+  else if(speed_val < 1) 
+  {
+    speed_val = 1;
+    ROS_WARN("Speed parameter < 1, clamped to 1.");
+  }
+  PTP_speed = std::to_string(speed_val);
+
   std::cout << "CSV Path: " << csv_path << std::endl;
   std::cout << "PTP speed(%): " << PTP_speed << std::endl;
 
