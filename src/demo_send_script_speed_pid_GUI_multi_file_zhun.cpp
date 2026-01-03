@@ -12,8 +12,8 @@
 #include <chrono>
 #include <vector>
 #include <cstdio>
-#include <iomanip> // 為了 std::setprecision
-#include <iostream> // 引入 iostream
+#include <iomanip> // For std::setprecision
+#include <iostream> // Include iostream
 
 std::fstream file;
 std::fstream file_start;
@@ -23,9 +23,9 @@ std::fstream PID_file;
 
 #define pi 3.1415926
 
-// 全域變數宣告
+// Global variable declaration
 double joint[6];
-double actual_joint_vel[6]; // 用來存實際角速度 (deg/s)
+double actual_joint_vel[6]; // Store actual joint velocities (deg/s)
 
 std::vector<std::vector<float>> read_csv(std::string filename){
     std::vector<std::vector<float>> content;
@@ -49,10 +49,10 @@ std::vector<std::vector<float>> read_csv(std::string filename){
     return content;
 }
 
-// Callback 函式
+// Callback function
 void TMmsgCallback(const tm_msgs::FeedbackState::ConstPtr& msg)
 {
-  // 讀取位置
+  // Read position
   if(msg->joint_pos.size() == 6)
   {
     for (int i = 0; i < 6; i++){
@@ -64,7 +64,7 @@ void TMmsgCallback(const tm_msgs::FeedbackState::ConstPtr& msg)
     ROS_ERROR_STREAM("Error FeedbackState callback (Pos)"); 
   }
 
-  // 讀取速度
+  // Read velocity
   if(msg->joint_vel.size() == 6)
   {
     for (int i = 0; i < 6; i++){
@@ -175,7 +175,7 @@ int main(int argc, char **argv)
   
   file.open(output_file_path, std::ios::out | std::ios::trunc);
   
-  // CSV 標頭
+  // CSV header
   file << "count,joint[0],joint[1],joint[2],joint[3],joint[4],joint[5],desired[0],desired[1],desired[2],desired[3],desired[4],desired[5],v[0],v[1],v[2],v[3],v[4],v[5],act_v[0],act_v[1],act_v[2],act_v[3],act_v[4],act_v[5]\n";
   
   auto start = std::chrono::steady_clock::now();
@@ -188,7 +188,7 @@ int main(int argc, char **argv)
     
     bool path_finished = false; 
 
-    // 顯示 desired joint (為了版面乾淨，這裡可以註解掉，或保留)
+    // Display desired joint (can be commented out for cleaner output)
     // std::cout << "Desired ==> ... " << std::endl; 
     
     end = std::chrono::steady_clock::now();
@@ -203,7 +203,7 @@ int main(int argc, char **argv)
       break;
     }
     else{
-        // 讀取 CSV 目標點
+        // Read CSV target point
         if (count >= data.size()){
             for(int i=0; i<6; i++) desired[i] = goal_joint[i];
             path_finished = true; 
@@ -213,7 +213,7 @@ int main(int argc, char **argv)
             for(int i=0; i<6; i++) desired[i] = data[count][i];
         }
 
-        // 計算 Error 與 Command
+        // Calculate Error and Command
         for (int i = 0; i < 6; i++){
           error[i] = desired[i] - joint[i];
           command[i] = kp * error[i]; 
@@ -232,7 +232,7 @@ int main(int argc, char **argv)
           old_error[i] = error[i];
         }
 
-        // 檢查是否到達
+        // Check if reached
         if (path_finished) {
             bool reached = true;
             for(int i=0; i<6; i++) {
@@ -245,22 +245,22 @@ int main(int argc, char **argv)
             if (reached) {
                 ROS_INFO_STREAM("Target Reached within tolerance (" << position_tolerance << " deg).");
                 
-                // 1. 停止速度模式
+                // 1. Stop velocity mode
                 srv.request.id = "demo";
                 srv.request.script = cmd_stop;
                 client.call(srv);
                 ROS_INFO_STREAM("Velocity Mode Stopped.");
                 
-                // 2. 關閉檔案
+                // 2. Close file
                 file.close();
                 if (file_start.is_open()) file_start.close();
 
-                // 3. 跳出 Control Loop (重要！)
+                // 3. Break Control Loop (Important!)
                 break; 
             }
         }
 
-        // 發送速度指令
+        // Send velocity command
         result = front_s;
         for (int i = 0; i < 6; i++)
         {
