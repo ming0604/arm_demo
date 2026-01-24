@@ -187,7 +187,7 @@ int main(int argc, char **argv)
   while (ros::ok()){
     ros::spinOnce(); 
     
-    bool path_finished = false; 
+    //bool path_finished = false; 
 
     // Display desired joint (can be commented out for cleaner output)
     // std::cout << "Desired ==> ... " << std::endl; 
@@ -207,7 +207,7 @@ int main(int argc, char **argv)
         // Read CSV target point
         if (count >= data.size()){
             for(int i=0; i<6; i++) desired[i] = goal_joint[i];
-            path_finished = true; 
+            //path_finished = true; 
             remove("/home/lab816/Desktop/code_cheng/code/main/mainKinematic/check_file/start.txt");
         }
         else{
@@ -234,6 +234,7 @@ int main(int argc, char **argv)
         }
 
         // Check if reached
+        /*
         if (path_finished) {
             bool reached = true;
             for(int i=0; i<6; i++) {
@@ -260,6 +261,7 @@ int main(int argc, char **argv)
                 break; 
             }
         }
+        */
 
         // Send velocity command
         result = front_s;
@@ -295,7 +297,18 @@ int main(int argc, char **argv)
       
       rate.sleep();
   }
+
   // ========================== End of Loop ==========================
+
+  // Cleanup when loop exits (e.g. Ctrl+C triggers !ros::ok())
+  if (file.is_open()) {
+      file.close(); 
+      ROS_INFO_STREAM("Output file closed.");  
+  }
+  
+  if (file_start.is_open()) {
+      file_start.close();
+  }
 
   ROS_INFO_STREAM("Program Finished.");
   return 0;
