@@ -217,7 +217,7 @@ int main(int argc, char **argv)
   ROS_INFO_STREAM("Starting Control Loop...");
   usleep(10000); // sleep for 10ms to wait for platform controller's first timer routine
   // ========================== PID Control Loop ==========================
-  while (ros::ok()){//傻逼 SB
+  while (ros::ok()){
     ros::spinOnce(); 
     
     //bool path_finished = false; 
