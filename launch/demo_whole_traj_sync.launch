@@ -1,0 +1,8 @@
+<launch>
+
+    <node pkg="demo" type="demo_send_script_speed_pid_GUI_multi_file_sync" name="demo_whole_traj_sync" output="screen">
+        <param name="traj_csv_path" value="/home/lab816/localization_ws/src/tmr_ros1/demo/data_setting/tm5_L055_vec_1_6_0_t_80_acct_20.csv" />
+        <param name="output_file_path" value="/home/lab816/localization_ws/src/tmr_ros1/demo/data_setting/data_save/tm5_L055_vec_1_6_0_t_80_acct_20_command_limit_45_20260126_result.csv" />
+        <param name="kp_gain" value="5.0" />
+    </node>
+</launch>

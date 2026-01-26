@@ -170,6 +170,7 @@ add_executable(demo_send_script_speed_pid_GUI_multi_file src/demo_send_script_sp
 add_executable(demo_send_script_speed_pid_GUI_multi_file_move_to_init src/demo_send_script_speed_pid_GUI_multi_file_move_to_init.cpp)
 add_executable(demo_send_script_speed_pid_GUI_multi_file_zhun src/demo_send_script_speed_pid_GUI_multi_file_zhun.cpp)
 add_executable(demo_send_script_speed_pid_GUI_multi_file_move_to_end src/demo_send_script_speed_pid_GUI_multi_file_move_to_end.cpp)
+add_executable(demo_send_script_speed_pid_GUI_multi_file_sync src/demo_send_script_speed_pid_GUI_multi_file_sync.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -210,6 +211,7 @@ add_dependencies(demo_send_script_speed_pid_GUI_multi_file ${${PROJECT_NAME}_EXP
 add_dependencies(demo_send_script_speed_pid_GUI_multi_file_move_to_init ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(demo_send_script_speed_pid_GUI_multi_file_zhun ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(demo_send_script_speed_pid_GUI_multi_file_move_to_end ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(demo_send_script_speed_pid_GUI_multi_file_sync ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 
 ## Specify libraries to link a library or executable target against
@@ -307,6 +309,10 @@ ${catkin_LIBRARIES}
 target_link_libraries(demo_send_script_speed_pid_GUI_multi_file_move_to_end
 ${catkin_LIBRARIES}
 ) 
+target_link_libraries(demo_send_script_speed_pid_GUI_multi_file_sync
+${catkin_LIBRARIES}
+) 
+
 #############
 ## Install ##
 #############
