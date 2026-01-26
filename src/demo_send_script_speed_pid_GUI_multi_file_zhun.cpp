@@ -88,7 +88,7 @@ void TMmsgCallback(const tm_msgs::FeedbackState::ConstPtr& msg)
 int main(int argc, char **argv)
 {   
   // ROS node initialization
-  ros::init(argc, argv, "demo_send_script", ros::init_options::NoSigintHandler);
+  ros::init(argc, argv, "demo_send_script_zhun", ros::init_options::NoSigintHandler);
   // handle Ctrl+C
   signal(SIGINT, my_sigint_handler);
 
