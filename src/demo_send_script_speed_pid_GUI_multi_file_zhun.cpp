@@ -301,6 +301,20 @@ int main(int argc, char **argv)
   // ========================== End of Loop ==========================
 
   // Cleanup when loop exits (e.g. Ctrl+C triggers !ros::ok())
+  // Stop velocity mode
+  srv.request.id = "demo";
+  srv.request.script = cmd_stop;
+  if (client.call(srv))                             
+  {
+    if (srv.response.ok) ROS_INFO_STREAM("Stop Velocity Mode => Sent script to robot");
+    else ROS_WARN_STREAM("Sent script to robot , but response not yet ok ");
+  }
+  else
+  {
+    ROS_ERROR_STREAM("Error sending stop script to robot (Connection might be closed due to Ctrl+C)");
+    //return 1;
+  }
+
   if (file.is_open()) {
       file.close(); 
       ROS_INFO_STREAM("Output file closed.");  
