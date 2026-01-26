@@ -14,6 +14,7 @@
 #include <cstdio>
 #include <iomanip> // For std::setprecision
 #include <iostream> // Include iostream
+#include <signal.h> // For ctrl+c handling
 
 std::fstream file;
 std::fstream file_start;
@@ -26,6 +27,13 @@ std::fstream PID_file;
 // Global variable declaration
 double joint[6];
 double actual_joint_vel[6]; // Store actual joint velocities (deg/s)
+
+bool CtrlCStop = false;
+
+void my_sigint_handler(int signum)
+{
+    CtrlCStop = true;
+}
 
 std::vector<std::vector<float>> read_csv(std::string filename){
     std::vector<std::vector<float>> content;
@@ -80,7 +88,10 @@ void TMmsgCallback(const tm_msgs::FeedbackState::ConstPtr& msg)
 int main(int argc, char **argv)
 {   
   // ROS node initialization
-  ros::init(argc, argv, "demo_send_script");      
+  ros::init(argc, argv, "demo_send_script", ros::init_options::NoSigintHandler);
+  // handle Ctrl+C
+  signal(SIGINT, my_sigint_handler);
+
   ros::NodeHandle nh_demo; 
   ros::NodeHandle nh_private("~"); // for getting private parameters
   ros::Subscriber sub = nh_demo.subscribe("feedback_states", 1000, TMmsgCallback);
@@ -184,7 +195,7 @@ int main(int argc, char **argv)
 
   ROS_INFO_STREAM("Starting Control Loop...");
   // ========================== PID Control Loop ==========================
-  while (ros::ok()){
+  while (ros::ok() && !CtrlCStop){
     ros::spinOnce(); 
     
     //bool path_finished = false; 
