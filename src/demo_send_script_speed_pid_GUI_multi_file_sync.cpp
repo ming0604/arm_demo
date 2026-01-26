@@ -14,6 +14,7 @@
 #include <cstdio>
 #include <iomanip> // For std::setprecision
 #include <iostream> // Include iostream
+#include <signal.h> // For ctrl+c handling
 
 #include <sys/sem.h>
 #include <sys/ipc.h>
@@ -34,6 +35,8 @@ std::fstream PID_file;
 // Global variable declaration
 double joint[6];
 double actual_joint_vel[6]; // Store actual joint velocities (deg/s)
+
+bool CtrlCStop = false;
 
 key_t semKey_rend_sync = (key_t)555; //semaphore key
 struct sembuf sop; // for P() V() operation
@@ -67,6 +70,11 @@ std::vector<std::vector<float>> read_csv(std::string filename){
     return content;
 }
 
+void my_sigint_handler(int signum)
+{
+    CtrlCStop = true;
+}
+
 // Callback function
 void TMmsgCallback(const tm_msgs::FeedbackState::ConstPtr& msg)
 {
@@ -98,7 +106,10 @@ void TMmsgCallback(const tm_msgs::FeedbackState::ConstPtr& msg)
 int main(int argc, char **argv)
 {   
   // ROS node initialization
-  ros::init(argc, argv, "demo_send_script");      
+  ros::init(argc, argv, "demo_send_script_sync", ros::init_options::NoSigintHandler); 
+    // handle Ctrl+C
+  signal(SIGINT, my_sigint_handler);
+
   ros::NodeHandle nh_demo; 
   ros::NodeHandle nh_private("~"); // for getting private parameters
   ros::Subscriber sub = nh_demo.subscribe("feedback_states", 1000, TMmsgCallback);
@@ -217,7 +228,7 @@ int main(int argc, char **argv)
   ROS_INFO_STREAM("Starting Control Loop...");
   usleep(10000); // sleep for 10ms to wait for platform controller's first timer routine
   // ========================== PID Control Loop ==========================
-  while (ros::ok()){
+  while (ros::ok() && !CtrlCStop){
     ros::spinOnce(); 
     
     //bool path_finished = false; 
@@ -331,9 +342,24 @@ int main(int argc, char **argv)
       rate.sleep();
   }
 
+
   // ========================== End of Loop ==========================
 
   // Cleanup when loop exits (e.g. Ctrl+C triggers !ros::ok())
+  // Stop velocity mode
+  srv.request.id = "demo";
+  srv.request.script = cmd_stop;
+  if (client.call(srv))                             
+  {
+    if (srv.response.ok) ROS_INFO_STREAM("Stop Velocity Mode => Sent script to robot");
+    else ROS_WARN_STREAM("Sent script to robot , but response not yet ok ");
+  }
+  else
+  {
+    ROS_ERROR_STREAM("Error sending stop script to robot (Connection might be closed due to Ctrl+C)");
+    //return 1;
+  }
+
   if (file.is_open()) {
       file.close(); 
       ROS_INFO_STREAM("Output file closed.");  
@@ -346,6 +372,7 @@ int main(int argc, char **argv)
   ROS_INFO_STREAM("Program Finished.");
   return 0;
 }
+
 
 
 
